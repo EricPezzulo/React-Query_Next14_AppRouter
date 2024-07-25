@@ -1,7 +1,10 @@
 "use client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import Link from "next/link";
 import { useState } from "react";
+import { useEditPost } from "../hooks/usePost";
+import CheckIcon from "./svgs/CheckIcon";
+import PencilIcon from "./svgs/PencilIcon";
 
 const AdminBlogPost = ({
   index,
@@ -10,32 +13,18 @@ const AdminBlogPost = ({
   index: number;
   post: { title: string; postId: number; content: string };
 }) => {
-  const queryClient = useQueryClient();
   const [edit, setEdit] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>("test");
+  const [title, setTitle] = useState<string>(post.title);
+  const [content, setContent] = useState<string>(post.content);
 
-  const editPost = async () => {
-    await fetch(`/blog/${post.postId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title, postId: post.postId }),
-    });
-  };
-  const postMutation = useMutation({
-    mutationFn: editPost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["post"] });
-    },
-  });
-  const clickMutate = () => {
-    postMutation.mutate({
-      title: title,
-      postId: post.postId,
-    });
+  const { mutate: updatePost } = useEditPost();
+
+  const handleEditPostClick = () => {
+    const updatedPost = { postId: post.postId, title, content };
+    updatePost(updatedPost);
     setEdit((prev) => !prev);
   };
+
   return (
     <div className="p-2">
       <div className="h-[200px] w-[500px] overflow-auto rounded-lg border-2 border-slate-300 p-5 scrollbar-hide">
@@ -56,20 +45,23 @@ const AdminBlogPost = ({
                 className="flex h-10 items-center pl-1 text-xl font-medium hover:underline"
               >
                 {post.title}
-              </Link>{" "}
+              </Link>
             </div>
           )}
 
           <button
             type="button"
-            onClick={edit ? clickMutate : () => setEdit((prev) => !prev)}
+            onClick={
+              edit ? handleEditPostClick : () => setEdit((prev) => !prev)
+            }
           >
-            {edit ? "Save" : "Edit"}
+            {edit ? <CheckIcon /> : <PencilIcon />}
           </button>
         </div>
         <div>
           {edit ? (
             <textarea
+              onChange={(e) => setContent(e.target.value)}
               className="h-28 w-full resize-none overflow-auto rounded bg-slate-100 px-2 outline outline-1 outline-slate-300"
               defaultValue={post.content}
             />

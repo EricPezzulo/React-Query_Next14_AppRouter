@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import usePosts from "../hooks/usePosts";
+import { useFetchPosts } from "../hooks/usePost";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 interface BlogPost {
   title: string;
@@ -10,8 +11,19 @@ interface BlogPost {
 }
 const Blog = () => {
   const router = useRouter();
-  const postQuery = usePosts();
-  console.log(postQuery.data);
+  const { data, isLoading, isError } = useFetchPosts();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center">
+        <p>Loading blog posts.</p>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+  if (isError) {
+    return <div>There was an error 🙁</div>;
+  }
   return (
     <div className="p-10">
       <h1 className="text-3xl">Blogs</h1>
@@ -23,15 +35,17 @@ const Blog = () => {
         {"< Back"}
       </button>
       <div className="grid grid-cols-2">
-        {postQuery.data?.posts.map((post: BlogPost, key: number) => (
+        {data?.posts.map((post: BlogPost, key: number) => (
           <div key={key} className="p-2">
             <div className="h-[200px] w-[500px] overflow-auto rounded-lg border-2 border-slate-300 p-5 scrollbar-hide">
-              <Link
-                href={`/blog/${post.postId}`}
-                className="text-xl font-medium hover:underline"
-              >
-                {post.title}
-              </Link>
+              <div className="pb-3">
+                <Link
+                  href={`/blog/${post.postId}`}
+                  className="text-xl font-medium hover:underline"
+                >
+                  {post.title}
+                </Link>
+              </div>
               <p>{post.content}</p>
             </div>
           </div>

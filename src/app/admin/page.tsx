@@ -1,8 +1,9 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import usePosts from "../hooks/usePosts";
+
 import AdminBlogPost from "../components/AdminBlogPost";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useFetchPosts } from "../hooks/usePost";
 
 interface BlogPost {
   title: string;
@@ -11,8 +12,19 @@ interface BlogPost {
 }
 const Blog = () => {
   const router = useRouter();
-  const postQuery = usePosts();
+  const { data, isLoading, isError } = useFetchPosts();
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center">
+        <p>Loading blog posts </p>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+  if (isError) {
+    return <div>There was an error.</div>;
+  }
   return (
     <div className="p-10">
       <h1 className="text-3xl">Admin</h1>
@@ -24,7 +36,7 @@ const Blog = () => {
         {"< Back"}
       </button>
       <div className="grid grid-cols-2">
-        {postQuery.data?.posts.map((post: BlogPost, key: number) => (
+        {data.posts.map((post: BlogPost, key: number) => (
           <AdminBlogPost key={key} index={key} post={post} />
         ))}
       </div>
