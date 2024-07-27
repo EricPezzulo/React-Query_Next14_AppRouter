@@ -1,5 +1,10 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-// const queryClient = new QueryClient();
+import {
+  dehydrate,
+  QueryClient,
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query";
+
 import { useQueryClient } from "@tanstack/react-query";
 
 // Fetch Blog Posts
@@ -7,7 +12,7 @@ export function useFetchPosts() {
   return useQuery({ queryKey: ["posts"], queryFn: getPosts });
 }
 
-const getPosts = async () => {
+export const getPosts = async () => {
   const res = await fetch(`/api/blog/`, {
     method: "GET",
     headers: {
@@ -60,5 +65,11 @@ const editPost = async ({ postId, title, content }: PostTypes) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ title, postId, content }),
+  });
+};
+export function useFetchPostsSSR(){
+  return useQuery({
+    queryKey: ["posts"],
+    queryFn: () => getPosts(),
   });
 };
