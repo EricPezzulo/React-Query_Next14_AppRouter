@@ -36,8 +36,7 @@ const BlogPosts = () => {
       </button>
       <div className="grid grid-cols-1 place-items-center gap-5 lg:grid-cols-2 xl:grid-cols-3">
         {data?.posts.map((post: BlogPost, key: number) => (
-          <div key={key} >
-            <div className="h-[200px] overflow-auto w-full rounded-lg border border-slate-200 p-5 scrollbar-hide sm:w-full">
+            <div key={key} className="h-[200px] overflow-auto w-full rounded-lg border border-slate-200 p-5 scrollbar-hide sm:w-full">
                 <div className="pb-3">
                   <Link
                     href={`/blog/${post.postId}`}
@@ -48,7 +47,6 @@ const BlogPosts = () => {
                 </div>
                 <p>{post.content}</p>
               </div>
-          </div>
         ))}
       </div>
     </div>
